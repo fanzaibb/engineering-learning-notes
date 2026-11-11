@@ -34,7 +34,7 @@ Day04仍屬W1（11/05～11/11），實際時數待登錄。以上日期與接續
 |---|---|---|
 | E01 | GitHub 主分支 notes/day-01.md | 原生 HTTP、TCP、Azure CLI、角色查詢紀錄，2026-11-09 已讀 |
 | E02 | GitHub docs/day-02 分支 notes/day-02.md | 本機路由／ARP／traceroute、Azure 兩子網路與清理，2026-11-09 已讀。主分支此路徑尚無檔案 |
-| E03 | 本聊天 Day 03 操作回報與畫面 | 東亞虛擬機器、NSG 關聯、IP flow verify 兩來源符合預期，兩個練習資源群組 exists 為 false |
+| E03 | 本聊天 Day 03 操作回報與畫面 | 東亞虛擬機器、NSG 關聯、IP flow verify 兩來源符合預期，兩個練習資源群組 exists 為 false | 來源：終端機歷史（1050–1057）；輸出未保存。
 | E04 | expense-api/src/server.ts 與 VS Code 終端機 | 2026-11-09 已重讀程式。此前直接觀察新增 201、刪除 204、刪後空列表、重複刪除 404 |
 | E05 | react-flow 與 gallery 程式抽樣 | 複雜前端資料流、儲存與狀態管理的起點依據，個別作者與獨立能力以診斷補證據 |
 | E06 | 本聊天 11/07～11/09 概念討論 | PK／FK、JOIN、交易、回滾、連線池、映像與容器等。尚無 SQL 執行與資料庫連線實作 |
