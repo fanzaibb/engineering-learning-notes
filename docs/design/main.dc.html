@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<title>知識山域：後端開發山</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&amp;family=Noto+Serif+TC:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F6F3EA}
+a{color:#2F4A36}a:hover{color:#1C2E21}
+.mono{font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.navbtn{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border:0;background:transparent;font:inherit;font-size:14px;color:#3E4A3C;cursor:pointer;border-bottom:2px solid transparent}
+.navbtn.on{color:#1F2A22;border-bottom-color:#A4553A}
+.mtn{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:8px;color:#1F2A22;text-decoration:none;min-height:44px}
+.mtn.on{background:#2F4A36;color:#FFFFFF}
+.mtn small{display:block;font-size:12px;opacity:.85;margin-top:2px;line-height:1.5}
+.fbtn{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:6px 10px;border:1px solid transparent;border-radius:6px;background:transparent;font:inherit;font-size:13px;color:#2B3529;cursor:pointer;text-align:left}
+.fbtn.on{border-color:#2F4A36;background:#FFFDF7}
+.fbtn .n{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#4E574A}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:none;box-sizing:border-box}
+.dot.d{background:#2F4A36;border:2px solid #2F4A36}
+.dot.t{background:transparent;border:2px solid #2F4A36}
+.dot.x{background:transparent;border:2px dashed #6B7765}
+.seg{display:inline-flex;border:1px solid #B9C2AC;border-radius:8px;overflow:hidden;background:#FFFDF7}
+.seg button{min-height:40px;padding:0 16px;border:0;background:transparent;font:inherit;font-size:13px;color:#2B3529;cursor:pointer}
+.seg button.on{background:#2F4A36;color:#FFFFFF}
+.band{position:relative;display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px dashed rgba(47,74,54,.22)}
+.band .lbl{flex:none;width:132px;padding:6px 10px;border-radius:6px;background:rgba(246,243,234,.92);border:1px solid rgba(47,74,54,.18)}
+.band .lbl b{display:block;font-size:13px;color:#1F2A22}
+.band .lbl span{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4E574A;margin-top:2px}
+.band .chips{flex:1;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.b1 .chips{padding:0 1%}.b2 .chips{padding:0 4%}.b3 .chips{padding:0 7%}.b4 .chips{padding:0 11%}
+.b5 .chips{padding:0 15%}.b6 .chips{padding:0 19%}.b7 .chips{padding:0 21%}.b8 .chips{padding:0 28%}
+.mist{background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.55) 18%,rgba(255,255,255,.55) 82%,rgba(255,255,255,0) 100%)}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:6px 14px;border-radius:8px;background:#FFFDF7;font:inherit;font-size:14px;color:#1F2A22;cursor:pointer;box-shadow:0 1px 2px rgba(31,42,34,.12);transition:opacity .15s}
+.chip.st-d{border:1.5px solid #2F4A36}
+.chip.st-t{border:1.5px solid #8DA07E}
+.chip.st-x{border:1.5px dashed #6B7765;background:#F4F3EC;color:#3E4A3C}
+.chip.is-sel{background:#2F4A36;color:#FFFFFF;border-color:#2F4A36;box-shadow:0 0 0 3px #E6C9A8}
+.chip.is-sel .dot.d,.chip.is-sel .dot.t,.chip.is-sel .dot.x{border-color:#FFFFFF}
+.chip.is-sel .dot.d{background:#FFFFFF}
+.chip.is-dim{opacity:.3}
+.row{display:grid;grid-template-columns:minmax(0,220px) 88px minmax(0,1fr) minmax(0,200px);gap:16px;align-items:center;width:100%;min-height:52px;padding:10px 14px;border:0;border-bottom:1px solid #E3E1D6;background:transparent;font:inherit;text-align:left;color:#1F2A22;cursor:pointer}
+.row.is-sel{background:#EEF0E6}
+.row .st{display:inline-flex;align-items:center;gap:6px;font-size:13px}
+.row .sum{font-size:14px;color:#2B3529;line-height:1.6}
+.row .ev{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#4E574A}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #1F2A22; background: #F6F3EA">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 28px; border-bottom: 1px solid #E3E1D6; background: #FBF9F2">
+    <div style="display: flex; align-items: center; gap: 14px">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18.5" fill="none" stroke="#2F4A36" stroke-width="1.5"></circle><path d="M9 27 L16 15 L20 21 L24 13 L31 27 Z" fill="none" stroke="#2F4A36" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+      <div>
+        <div style="font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 700; letter-spacing: .06em">山行 · 知識山域</div>
+        <div class="mono" style="font-size: 10px; color: #4E574A">The Knowledge Range</div>
+      </div>
+      <p style="margin: 0 0 0 12px; font-size: 13px; color: #4E574A">從山腳的基礎往上走，每一層都踩在下一層上。</p>
+    </div>
+    <nav aria-label="主要導覽" style="display: flex; gap: 8px">
+      <button type="button" class="navbtn on">探索山域</button>
+      <button type="button" class="navbtn">山域挑戰</button>
+      <button type="button" class="navbtn">回訪背包</button>
+    </nav>
+  </header>
+
+  <div style="flex: 1; display: flex; flex-wrap: wrap">
+    <aside style="flex: 1 1 240px; max-width: 280px; box-sizing: border-box; padding: 24px 20px; border-right: 1px solid #E3E1D6; display: flex; flex-direction: column; gap: 22px">
+      <div>
+        <div class="mono" style="font-size: 10px; color: #4E574A; margin-bottom: 4px">Choose a mountain</div>
+        <div style="font-weight: 700; font-size: 15px; margin-bottom: 10px">我的知識山域</div>
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <a href="#" class="mtn on"><span class="mono" style="font-size: 11px">01</span><span>後端開發<small>請求、資料與服務的內在邏輯</small></span></a>
+          <a href="#" class="mtn"><span class="mono" style="font-size: 11px">02</span><span>Azure 與部署<small>從本機到雲端的那一段路</small></span></a>
+          <a href="#" class="mtn"><span class="mono" style="font-size: 11px">03</span><span>軟體工程<small>讓修改、驗證與交付值得信任</small></span></a>
+          <a href="#" class="mtn"><span class="mono" style="font-size: 11px">04</span><span>多益準備<small>聽力與閱讀，走自己的節奏</small></span></a>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="q" style="font-size: 13px; font-weight: 500">找知識點</label>
+        <input id="q" type="search" placeholder="例如：交易、CORS" onInput="{{ onSearch }}" style="min-height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid #B9C2AC; border-radius: 8px; background: #FFFDF7; font: inherit; font-size: 14px; color: #1F2A22">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 13px; font-weight: 500; margin-bottom: 4px">狀態篩選</div>
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+          <button type="button" class="{{ f.cls }}" aria-pressed="{{ f.pressed }}" onClick="{{ f.pick }}"><sc-if value="{{ f.hasDot }}" hint-placeholder-val="{{ true }}"><span class="{{ f.dotCls }}"></span></sc-if><span>{{ f.label }}</span><span class="n">{{ f.count }}</span></button>
+        </sc-for>
+      </div>
+
+      <div style="padding: 14px; border: 1px solid #E3E1D6; border-radius: 8px; background: #FBF9F2; font-size: 13px; line-height: 1.7; color: #2B3529">
+        <div style="font-weight: 700; margin-bottom: 4px">怎麼讀這座山</div>
+        高度是學習順序，不是完成率。越下面越基礎，上層要靠下層才站得住。雲霧帶是 W3 之後的課程，多數只討論過、還沒實作。
+      </div>
+
+      <div style="font-size: 12px; color: #4E574A; line-height: 1.8">
+        <div class="mono" style="font-size: 10px">Content baseline</div>
+        2026-11-10，依 PROGRESS.md 證據 E01–E20
+      </div>
+    </aside>
+
+    <main style="flex: 999 1 640px; min-width: 0; box-sizing: border-box; padding: 24px 28px 40px; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+        <div>
+          <div class="mono" style="font-size: 10px; color: #4E574A">The Builder / Knowledge Map</div>
+          <h1 style="margin: 6px 0 6px; font-family: 'Noto Serif TC', serif; font-size: 36px; font-weight: 700; letter-spacing: .04em">後端開發山</h1>
+          <p style="margin: 0; font-size: 14px; color: #3E4A3C">{{ total }} 個知識點、8 層。帶做 {{ cD }}、討論 {{ cT }}、待探索 {{ cX }}。點任一個知識點看它的一句話結論與證據。</p>
+        </div>
+        <div class="seg" role="group" aria-label="檢視方式">
+          <button type="button" class="{{ mapBtn }}" onClick="{{ toMap }}">地圖</button>
+          <button type="button" class="{{ listBtn }}" onClick="{{ toList }}">清單</button>
+        </div>
+      </div>
+
+      <sc-if value="{{ isMap }}" hint-placeholder-val="{{ true }}">
+        <section aria-label="知識地圖" style="position: relative; border: 1px solid #DCDDCF; border-radius: 12px; overflow: hidden; background: #E9ECDF">
+          <svg viewBox="0 0 1000 900" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
+            <polygon points="0,900 0,520 150,380 300,540 420,300 520,60 640,320 760,220 1000,520 1000,900" fill="#D5DCC6"></polygon>
+            <polygon points="40,900 520,50 980,900" fill="#A9B999"></polygon>
+            <polygon points="520,50 980,900 640,900 560,420" fill="#BFCBAE"></polygon>
+            <polygon points="455,165 520,50 585,165 552,150 520,182 488,150" fill="#F4F2E6"></polygon>
+            <polygon points="0,900 0,820 1000,820 1000,900" fill="#8FA27F"></polygon>
+            <g fill="#5F7656">
+              <polygon points="40,860 56,826 72,860"></polygon><polygon points="110,872 130,830 150,872"></polygon><polygon points="210,866 226,834 242,866"></polygon>
+              <polygon points="760,868 778,830 796,868"></polygon><polygon points="850,872 870,828 890,872"></polygon><polygon points="930,862 946,830 962,862"></polygon>
+            </g>
+          </svg>
+          <div style="position: relative; display: flex; flex-direction: column; padding: 16px 20px 24px">
+            <sc-for list="{{ bandsTop }}" as="band" hint-placeholder-count="8">
+              <div class="{{ band.cls }}">
+                <div class="lbl"><b>{{ band.alt }}・{{ band.name }}</b><span>{{ band.wk }}</span></div>
+                <div class="chips">
+                  <sc-for list="{{ band.nodes }}" as="n" hint-placeholder-count="4">
+                    <button type="button" class="{{ n.cls }}" aria-pressed="{{ n.pressed }}" onClick="{{ n.pick }}"><span class="{{ n.dotCls }}"></span>{{ n.t }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+        <section aria-label="知識清單，由基礎往上" style="border: 1px solid #DCDDCF; border-radius: 12px; background: #FFFDF7; overflow-x: auto">
+          <sc-if value="{{ hasAny }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ bandsBottom }}" as="band" hint-placeholder-count="8">
+              <sc-if value="{{ band.hasList }}" hint-placeholder-val="{{ true }}">
+                <div style="padding: 12px 14px 6px; background: #F1F2E8; border-bottom: 1px solid #E3E1D6; font-size: 13px; font-weight: 700">第 {{ band.n }} 層｜{{ band.alt }}・{{ band.name }} <span class="mono" style="font-weight: 400; font-size: 11px; color: #4E574A">{{ band.wk }}</span></div>
+                <sc-for list="{{ band.listNodes }}" as="n" hint-placeholder-count="4">
+                  <button type="button" class="{{ n.rowCls }}" onClick="{{ n.pick }}"><b style="font-size: 14px">{{ n.t }}</b><span class="st"><span class="{{ n.dotCls }}"></span>{{ n.stLabel }}</span><span class="sum">{{ n.s }}</span><span class="ev">{{ n.ev }}</span></button>
+                </sc-for>
+              </sc-if>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ noneFound }}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0; padding: 24px; font-size: 14px; color: #3E4A3C">沒有符合的知識點，換個關鍵字或狀態試試。</p>
+          </sc-if>
+        </section>
+      </sc-if>
+
+      <section aria-label="選取的知識點" style="display: flex; flex-wrap: wrap; gap: 24px; padding: 22px 24px; border: 1px solid #DCDDCF; border-radius: 12px; background: #FFFDF7">
+        <div style="flex: 2 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 12px; color: #3E4A3C">
+            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid #B9C2AC; border-radius: 999px"><span class="{{ sel.dotCls }}"></span>{{ sel.stLabel }}</span>
+            <span>第 {{ sel.L }} 層・{{ selLayer }}</span>
+            <span class="mono" style="font-size: 11px">{{ sel.id }}</span>
+          </div>
+          <h2 style="margin: 0; font-family: 'Noto Serif TC', serif; font-size: 26px">{{ sel.t }}</h2>
+          <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #1F2A22">{{ sel.s }}</p>
+          <p style="margin: 6px 0 0; font-size: 13px; color: #4E574A">完整筆記：用前端經驗類比、易混淆點、縮寫全名與來源，由 knowledge/backend/{{ sel.id }}.md 產生。</p>
+        </div>
+        <dl style="flex: 1 1 220px; margin: 0; display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 8px 12px; font-size: 13px; align-content: start">
+          <dt style="color: #4E574A">證據</dt><dd style="margin: 0">{{ sel.ev }}</dd>
+          <dt style="color: #4E574A">週次</dt><dd style="margin: 0">{{ sel.wk }}</dd>
+          <dt style="color: #4E574A">相關</dt><dd style="margin: 0">{{ sel.relText }}</dd>
+        </dl>
+      </section>
+
+      <p style="margin: 0; font-size: 12px; color: #4E574A">位置代表知識的依賴順序，不代表完成率。狀態對應 PROGRESS.md：帶做＝L2、討論＝L1、待探索＝L0。</p>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1560}}'>
+class Component extends DCLogic {
+  state = { sel: 'be-08', view: 'map', filter: 'all', q: '' };
+
+  data() {
+    const layers = [
+      { n: 1, alt: '山腳', name: '網路地基', wk: 'W1 已走過' },
+      { n: 2, alt: '林道', name: '執行環境與 HTTP', wk: 'W1–W2' },
+      { n: 3, alt: '溪谷', name: '資料層', wk: 'W1–W2' },
+      { n: 4, alt: '稜線', name: 'API 契約與測試', wk: 'W1–W2' },
+      { n: 5, alt: '雲霧帶', name: '身分與資料權限', wk: 'W3' },
+      { n: 6, alt: '雲霧帶', name: '一致性與併發', wk: 'W4' },
+      { n: 7, alt: '高原', name: '交付與維運', wk: 'W4–W6' },
+      { n: 8, alt: '山頂', name: '獨立交付', wk: 'W7–W8' }
+    ];
+    const nodes = [
+      { id: 'be-01', L: 1, st: 'd', t: 'IPv4 子網路與 CIDR', s: '前綴越長、網段越小；Azure 每個子網路另保留 5 個位址。', ev: 'E02（兩個 /25 子網路）', wk: 'W1', rel: ['be-02'] },
+      { id: 'be-02', L: 1, st: 'd', t: '路由與預設閘道', s: '沒有更具體的路由就交給預設閘道，路由表選最長前綴那條。', ev: 'E01、E02（route、traceroute）', wk: 'W1', rel: ['be-01', 'be-03'] },
+      { id: 'be-03', L: 1, st: 'd', t: 'IP、MAC 與 ARP', s: 'IP 是最終目的地，MAC 只是這一段的下一手；ARP 把下一手的 IP 換成 MAC。', ev: 'E02（arp -n）', wk: 'W1', rel: ['be-02'] },
+      { id: 'be-04', L: 1, st: 'd', t: 'TCP、UDP 與位元組串流', s: 'TCP 給的是有序位元組串流，一次 write 不等於一次 data，訊息邊界要自己定。', ev: 'E01（node:net、nc）', wk: 'W1', rel: ['be-08', 'be-10'] },
+      { id: 'be-05', L: 1, st: 't', t: 'DNS 與 IPv4／IPv6 並存', s: 'DNS 可能同時回 A 與 AAAA 記錄，裝置依網路選一個；兩套位址彼此不相容。', ev: '11/10 複習', wk: 'W1', rel: ['be-06'] },
+      { id: 'be-06', L: 1, st: 't', t: 'Loopback 與監聽位址', s: '127.0.0.1 只通到同一個網路環境；容器裡要監聽 0.0.0.0，外面才連得到。', ev: '11/10 複習測驗', wk: 'W1', rel: ['be-15', 'be-27'] },
+      { id: 'be-07', L: 2, st: 'd', t: 'Event Loop 與阻塞', s: '同步的長計算會卡住所有請求，等待型的工作不會。', ev: 'E01（/slow 與 /fast）', wk: 'W1', rel: ['be-08'] },
+      { id: 'be-08', L: 2, st: 'd', t: 'HTTP 請求與回應', s: '狀態碼、標頭、本文各有分工；204 沒有本文，不能直接解析 JSON。', ev: 'E04（201／204／404）', wk: 'W1', rel: ['be-04', 'be-17'] },
+      { id: 'be-09', L: 2, st: 't', t: 'CORS 與瀏覽器', s: 'CORS 是瀏覽器執行的規則，不是資料防護；Postman 打得通不代表瀏覽器會放行。', ev: 'Day02、11/10 測驗', wk: 'W3 實作', rel: ['be-23'] },
+      { id: 'be-10', L: 2, st: 't', t: 'Socket 與 WebSocket', s: 'Socket 是通訊端點；WebSocket 是在 TCP 上、由 HTTP 升級而來的雙向協定。', ev: '11/10 複習', wk: '—', rel: ['be-04'] },
+      { id: 'be-35', L: 2, st: 'x', t: 'Linux 服務與日誌', s: '用 systemd 管服務、用 journalctl 看日誌，分清 NSG 與主機防火牆兩層。', ev: '尚無，W2 VM 實驗', wk: 'W2', rel: ['be-30'] },
+      { id: 'be-11', L: 3, st: 'd', t: '關聯模型：PK／FK／JOIN', s: '主鍵識別每一列，外鍵維持表與表的關聯，JOIN 把它們接回來。', ev: 'E08', wk: 'W1', rel: ['be-12'] },
+      { id: 'be-12', L: 3, st: 'd', t: '約束與型別', s: '資料庫端的約束是最後一道防線；外鍵拒絕 999 證明檢查發生在資料庫層。', ev: 'E08、E11（部分）', wk: 'W1', rel: ['be-11', 'be-16'] },
+      { id: 'be-13', L: 3, st: 'd', t: '參數化查詢', s: '外部輸入只當資料、不當指令，從根本擋住 SQL 注入。', ev: 'E09', wk: 'W1–W2', rel: ['be-17'] },
+      { id: 'be-14', L: 3, st: 'd', t: '連線池借還', s: '連線借了一定要還；閒置保留多久是延遲與資源的取捨。', ev: 'E08、E12（交易內借還待 W4）', wk: 'W1', rel: ['be-24'] },
+      { id: 'be-15', L: 3, st: 'd', t: '容器、映像與資料卷', s: '映像是模板、容器是執行中的實例，資料放資料卷才不會跟著容器消失。', ev: 'E08、E12', wk: 'W1', rel: ['be-27'] },
+      { id: 'be-16', L: 3, st: 'd', t: 'Schema 與 Migration', s: 'Schema 是設計圖，Migration 是依序套用的施工單；結構快照不等於版本追蹤。', ev: 'E13（快照）；工具待 W2', wk: 'W2', rel: ['be-29'] },
+      { id: 'be-17', L: 4, st: 'd', t: '輸入驗證與錯誤契約', s: '錯誤回應固定成 code／message／field，前端依 code 決定行為。', ev: 'E14', wk: 'W2', rel: ['be-08', 'be-19'] },
+      { id: 'be-18', L: 4, st: 'd', t: '持久化 CRUD', s: '五個端點都接資料庫；金額存整數分，對外以元呈現。', ev: 'E10、E11', wk: 'W1', rel: ['be-13'] },
+      { id: 'be-19', L: 4, st: 'd', t: '整合測試與隔離環境', s: '每次測試自建臨時資料庫與後端，結束清理，失敗也不汙染開發資料。', ev: 'E15–E18', wk: 'W2', rel: ['be-17'] },
+      { id: 'be-20', L: 4, st: 't', t: '冪等性', s: '做一次和做很多次的結果相同就是冪等，回應碼可以不同。', ev: 'Day05', wk: 'W1', rel: ['be-26'] },
+      { id: 'be-21', L: 5, st: 't', t: '身分驗證與授權', s: '驗證回答你是誰，授權回答你能做什麼，兩件事分開檢查。', ev: '尚無實作', wk: 'W3', rel: ['be-22', 'be-23'] },
+      { id: 'be-22', L: 5, st: 'x', t: '工作階段與 Cookie', s: '登入狀態怎麼保存、何時過期，以及 HttpOnly、SameSite 各擋什麼。', ev: '尚無', wk: 'W3', rel: ['be-21'] },
+      { id: 'be-23', L: 5, st: 't', t: '逐筆資料授權', s: '每個查詢都帶使用者範圍，A 改編號也拿不到 B 的資料。', ev: '尚無，待 A／B 交叉測試', wk: 'W3', rel: ['be-21', 'be-09'] },
+      { id: 'be-24', L: 6, st: 't', t: '交易、提交與回滾', s: '一包修改全部成功或全部撤銷；交易不會自動解決所有併發問題。', ev: '尚無，待失敗注入', wk: 'W4', rel: ['be-14', 'be-25'] },
+      { id: 'be-25', L: 6, st: 't', t: '版本衝突控制', s: '兩個分頁同時存同一筆，用版本條件拒絕過期的覆寫。', ev: '尚無', wk: 'W4', rel: ['be-24'] },
+      { id: 'be-26', L: 6, st: 't', t: '冪等鍵與重送', s: '同一次操作重試沿用同一把鍵，資料庫唯一約束保證只處理一次。', ev: '尚無', wk: 'W4', rel: ['be-20', 'be-24'] },
+      { id: 'be-27', L: 7, st: 't', t: 'Docker 映像與多階段建置', s: '建置與執行分開，映像只帶執行需要的東西，版本固定。', ev: '尚無', wk: 'W4（v1.2 提前）', rel: ['be-15', 'be-06'] },
+      { id: 'be-28', L: 7, st: 't', t: 'CI 與自動部署', s: '每次推送自動跑測試與建置，壞掉的測試擋住部署。', ev: '尚無', wk: 'W5', rel: ['be-19'] },
+      { id: 'be-29', L: 7, st: 't', t: '相容部署', s: '先擴張再收縮：過渡期新舊版本同時都要能運作。', ev: 'Day02、11/10 複習', wk: 'W5', rel: ['be-16'] },
+      { id: 'be-30', L: 7, st: 't', t: '日誌與 request ID', s: '用一個識別碼把一次請求的所有紀錄串起來。', ev: '尚無', wk: 'W6', rel: ['be-35'] },
+      { id: 'be-31', L: 7, st: 't', t: '存活與就緒檢查', s: '程式活著不代表能接流量；就緒檢查要真的連一次資料庫。', ev: 'Day02', wk: 'W6', rel: ['be-30'] },
+      { id: 'be-32', L: 7, st: 'x', t: '備份與還原', s: '沒有還原過的備份，不能算有備份。', ev: '尚無', wk: 'W3（VM）、W6', rel: ['be-15'] },
+      { id: 'be-33', L: 8, st: 'x', t: '未逐行指導的完整變更', s: '從需求、資料模型、後端、前端到測試，自己做完一次。', ev: '尚無', wk: 'W7', rel: ['be-19'] },
+      { id: 'be-34', L: 8, st: 'x', t: '乾淨重建與延後複驗', s: '隔一段時間在乾淨環境重建整套，通過七項結業門檻。', ev: '尚無', wk: 'W8', rel: ['be-33'] }
+    ];
+    return { layers, nodes };
+  }
+
+  renderVals() {
+    const { layers, nodes } = this.data();
+    const s = this.state;
+    const label = { d: '帶做', t: '討論', x: '待探索' };
+    const q = (s.q || '').trim().toLowerCase();
+    const match = (n) => (s.filter === 'all' || n.st === s.filter) && (!q || (n.t + n.s).toLowerCase().indexOf(q) !== -1);
+    const byId = {};
+    nodes.forEach((n) => { byId[n.id] = n; });
+    const deco = (n) => {
+      const isSel = n.id === s.sel;
+      return Object.assign({}, n, {
+        stLabel: label[n.st],
+        dotCls: 'dot ' + n.st,
+        cls: 'chip st-' + n.st + (isSel ? ' is-sel' : '') + (match(n) ? '' : ' is-dim'),
+        rowCls: 'row' + (isSel ? ' is-sel' : ''),
+        pressed: isSel ? 'true' : 'false',
+        pick: () => this.setState({ sel: n.id })
+      });
+    };
+    const bands = layers.map((l) => {
+      const mine = nodes.filter((n) => n.L === l.n);
+      const listNodes = mine.filter(match).map(deco);
+      return Object.assign({}, l, {
+        cls: 'band b' + l.n + (l.n >= 5 ? ' mist' : ''),
+        nodes: mine.map(deco),
+        listNodes: listNodes,
+        hasList: listNodes.length > 0
+      });
+    });
+    const cnt = (k) => nodes.filter((n) => n.st === k).length;
+    const sel = deco(byId[s.sel] || nodes[0]);
+    sel.relText = (sel.rel || []).map((id) => byId[id] ? byId[id].t : id).join('、') || '—';
+    const selLayerObj = layers.find((l) => l.n === sel.L);
+    const filterDefs = [
+      { k: 'all', label: '全部', count: nodes.length, hasDot: false },
+      { k: 'd', label: '帶做（L2）', count: cnt('d'), hasDot: true },
+      { k: 't', label: '討論（L1）', count: cnt('t'), hasDot: true },
+      { k: 'x', label: '待探索（L0）', count: cnt('x'), hasDot: true }
+    ];
+    const filters = filterDefs.map((f) => Object.assign({}, f, {
+      cls: 'fbtn' + (s.filter === f.k ? ' on' : ''),
+      pressed: s.filter === f.k ? 'true' : 'false',
+      dotCls: 'dot ' + f.k,
+      pick: () => this.setState({ filter: f.k })
+    }));
+    const hasAny = bands.some((b) => b.hasList);
+    return {
+      bandsTop: bands.slice().reverse(),
+      bandsBottom: bands,
+      filters: filters,
+      sel: sel,
+      selLayer: selLayerObj ? selLayerObj.alt + '・' + selLayerObj.name : '',
+      total: nodes.length,
+      cD: cnt('d'), cT: cnt('t'), cX: cnt('x'),
+      isMap: s.view === 'map',
+      isList: s.view === 'list',
+      hasAny: hasAny,
+      noneFound: !hasAny,
+      mapBtn: s.view === 'map' ? 'on' : '',
+      listBtn: s.view === 'list' ? 'on' : '',
+      toMap: () => this.setState({ view: 'map' }),
+      toList: () => this.setState({ view: 'list' }),
+      onSearch: (e) => this.setState({ q: e && e.target ? e.target.value : '' })
+    };
+  }
+}
+</script>
+</body>
+</html>
