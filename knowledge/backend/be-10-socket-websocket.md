@@ -17,10 +17,6 @@ sources:
 updated: 2026-11-11
 ---
 
-## 用前端經驗來想
-
-TODO：待使用者補上自己的前端類比。
-
 ## 說明
 
 Socket 是程式操作網路通訊的端點。Port 讓同一個 IP 上的連線能送到對應服務；`LISTEN` 表示等待連入，`ESTABLISHED` 表示 TCP 連線已建立（Day 01）。

@@ -1,224 +1,194 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { useRoute, useRouter, RouterLink } from 'vue-router';
-import {
-  knowledge, knowledgeMap, mountainMap, evidenceMap,
-  STATUS_LABEL, STATUS_LEVEL, type Status, type Knowledge,
-} from '../lib/content';
-import { decorateText, newEnv } from '../lib/markdown';
+import { knowledge, mountainMap, range, days, STATUS_LABEL, type Knowledge } from '../lib/content';
+import { makeTrees, pine } from '../lib/trees';
+import SidePanel from '../components/SidePanel.vue';
 import NotFoundView from './NotFoundView.vue';
 
 const route = useRoute();
 const router = useRouter();
 
-const mountain = computed(() => mountainMap.get(String(route.params.mountain)));
-const nodes = computed(() => knowledge.filter((k) => k.mountain === mountain.value?.id));
+const id = computed(() => String(route.params.mountain));
+const mountain = computed(() => mountainMap.get(id.value));
+const entry = computed(() => range.find((r) => r.id === id.value));
+const nodes = computed(() => knowledge.filter((k) => k.mountain === id.value));
+const latest = days[days.length - 1];
 
-// 其他山：目前只有後端開發山有內容，其餘保留入口
-const otherMountains = [
-  { no: '02', title: 'Azure 與部署', sub: '從本機到雲端的那一段路' },
-  { no: '03', title: '軟體工程', sub: '讓修改、驗證與交付值得信任' },
-  { no: '04', title: '多益準備', sub: '聽力與閱讀，走自己的節奏' },
+watchEffect(() => {
+  document.title = `${entry.value?.title ?? mountain.value?.title ?? '找不到頁面'}｜山行・知識山域`;
+});
+
+// 營地位置（百分比，卡片中心），由山腳往山頂之字形
+const SPOTS = [
+  { x: 22, y: 86 }, { x: 50, y: 75 }, { x: 29, y: 64 }, { x: 63, y: 54 },
+  { x: 37, y: 43 }, { x: 68, y: 32 }, { x: 43, y: 21 }, { x: 62, y: 10 },
 ];
 
-// 檢視、選取存在網址查詢參數，重新整理或分享連結都能回到同一狀態
-const view = computed<'map' | 'list'>(() => (route.query.view === 'list' ? 'list' : 'map'));
-const selId = computed(() => {
-  const q = String(route.query.sel ?? '');
-  return knowledgeMap.has(q) ? q : 'be-08';
-});
-const setQuery = (patch: Record<string, string | undefined>) =>
-  router.replace({ query: { ...route.query, ...patch } });
-
-// 手機上詳細區在地圖下方很遠，選取後若不在畫面內就捲過去
-const detailEl = ref<HTMLElement | null>(null);
-async function pick(id: string) {
-  await setQuery({ sel: id });
-  await nextTick();
-  const el = detailEl.value;
-  if (el && el.getBoundingClientRect().top > window.innerHeight - 80) el.scrollIntoView({ block: 'nearest' });
-}
-
-watchEffect(() => { document.title = mountain.value ? `${mountain.value.title}｜山行・知識山域` : '找不到頁面｜山行・知識山域'; });
-
-const filter = ref<'all' | Status>('all');
 const q = ref('');
-watch(() => route.params.mountain, () => { filter.value = 'all'; q.value = ''; });
+const term = computed(() => q.value.trim().toLowerCase());
+const hit = (n: Knowledge) => !term.value || (n.title + n.summary).toLowerCase().includes(term.value);
 
-const count = (s: Status) => nodes.value.filter((n) => n.status === s).length;
-const filters = computed(() => [
-  { key: 'all' as const, label: '全部', count: nodes.value.length },
-  { key: 'guided' as const, label: `帶做（${STATUS_LEVEL.guided}）`, count: count('guided') },
-  { key: 'discussed' as const, label: `討論（${STATUS_LEVEL.discussed}）`, count: count('discussed') },
-  { key: 'unexplored' as const, label: `待探索（${STATUS_LEVEL.unexplored}）`, count: count('unexplored') },
-]);
+const stages = computed(() => {
+  const m = mountain.value;
+  if (!m) return [];
+  return [...m.layers].sort((a, b) => a.n - b.n).map((l, i) => {
+    const list = nodes.value.filter((k) => k.layer === l.n);
+    const spot = SPOTS[i] ?? { x: 50, y: 50 };
+    return {
+      ...l, spot, list,
+      hits: list.filter(hit).length,
+      up: spot.y > 55,               // 下半部的營地往上展開，避免超出畫面
+      current: l.n === m.currentLayer,
+      counts: {
+        guided: list.filter((k) => k.status === 'guided').length,
+        discussed: list.filter((k) => k.status === 'discussed').length,
+        unexplored: list.filter((k) => k.status === 'unexplored').length,
+      },
+    };
+  });
+});
 
-const match = (n: Knowledge) => {
-  const term = q.value.trim().toLowerCase();
-  return (filter.value === 'all' || n.status === filter.value)
-    && (!term || (n.title + n.summary).toLowerCase().includes(term));
+// 路徑：依序通過各營地的平滑曲線（viewBox 1600×1000）
+const trailPath = computed(() => {
+  const pts = stages.value.map((s) => [s.spot.x * 16, s.spot.y * 10]);
+  if (!pts.length) return '';
+  let d = `M${pts[0][0] - 120},${pts[0][1] + 140} Q${pts[0][0] - 40},${pts[0][1] + 40} ${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1];
+    const [x1, y1] = pts[i];
+    const my = (y0 + y1) / 2;
+    d += ` C${x0},${my} ${x1},${my} ${x1},${y1}`;
+  }
+  return d;
+});
+
+const setQuery = (patch: Record<string, string | undefined>) => {
+  const query: Record<string, string> = {};
+  for (const [k, v] of Object.entries({ ...route.query, k: undefined, layer: undefined, panel: undefined, ...patch })) {
+    if (typeof v === 'string') query[k] = v;
+  }
+  router.replace({ query });
 };
+const openLayer = (n: number) => setQuery({ layer: String(n) });
+const openKnowledge = (kid: string) => setQuery({ k: kid });
+const openAll = () => setQuery({ panel: 'all' });
+const closePanel = () => setQuery({});
+const activeLayer = computed(() => {
+  const k = route.query.k ? knowledge.find((n) => n.id === route.query.k) : undefined;
+  return k?.layer ?? (route.query.layer ? Number(route.query.layer) : null);
+});
 
-const layersTop = computed(() => [...(mountain.value?.layers ?? [])].sort((a, b) => b.n - a.n));
-const layersBottom = computed(() => [...layersTop.value].reverse());
-const nodesIn = (n: number) => nodes.value.filter((k) => k.layer === n);
-const matchedIn = (n: number) => nodesIn(n).filter(match);
-const anyMatch = computed(() => nodes.value.some(match));
-
-const sel = computed(() => knowledgeMap.get(selId.value)!);
-const selLayer = computed(() => mountain.value?.layers.find((l) => l.n === sel.value.layer));
-const evidenceText = (k: Knowledge) => {
-  const ids = k.evidence.join('、');
-  if (ids && k.evidenceNote) return `${ids}（${k.evidenceNote}）`;
-  return ids || k.evidenceNote || '尚無';
-};
-const evidenceShort = (k: Knowledge) => k.evidence.join('、') || '—';
-const lastEvidence = computed(() => [...evidenceMap.keys()].pop());
-
-// 一句話結論也套縮寫 tooltip（不展開全名，避免標題區過長）
-const tip = (text: string, prefix: string) => decorateText(text, newEnv(prefix, false));
+const bgTrees = [
+  ...makeTrees(18, 5, { x0: 0, x1: 380, y0: 720, y1: 1010 }, [40, 80]),
+  ...makeTrees(16, 9, { x0: 1180, x1: 1600, y0: 660, y1: 1010 }, [40, 80]),
+  ...makeTrees(14, 17, { x0: 420, x1: 1180, y0: 930, y1: 1015 }, [30, 60]),
+].map(pine);
 </script>
 
 <template>
-  <NotFoundView v-if="!mountain" />
-  <div v-else class="layout">
-    <aside class="sidebar" aria-label="山域與篩選">
-      <div>
-        <div class="mono eyebrow">Choose a mountain</div>
-        <div style="font-weight: 700; font-size: 15px; margin: 4px 0 10px">我的知識山域</div>
-        <div style="display: flex; flex-direction: column; gap: 4px">
-          <RouterLink :to="`/m/${mountain.id}`" class="mtn on" aria-current="page">
-            <span class="mono" style="font-size: 11px">01</span>
-            <span>後端開發<small>{{ mountain.subtitle }}</small></span>
-          </RouterLink>
-          <div v-for="m in otherMountains" :key="m.no" class="mtn off">
-            <span class="mono" style="font-size: 11px">{{ m.no }}</span>
-            <span>{{ m.title }}<small>{{ m.sub }}・尚未建立</small></span>
-          </div>
-        </div>
-      </div>
+  <!-- 規劃中的山 -->
+  <main v-if="!mountain && entry" id="main" class="screen planned-page">
+    <div class="planned-box">
+      <div class="mono eyebrow">{{ entry.role }}</div>
+      <h1 class="page-title">{{ entry.title }}</h1>
+      <p class="lead">{{ entry.tagline }}。{{ entry.statusText }}，知識點還沒建立。</p>
+      <RouterLink to="/" class="btn-link">← 回到山域</RouterLink>
+    </div>
+  </main>
+  <NotFoundView v-else-if="!mountain" />
 
-      <div style="display: flex; flex-direction: column; gap: 6px">
-        <label for="q" class="field-label">找知識點</label>
-        <input id="q" v-model="q" type="search" class="search" placeholder="例如：交易、CORS" autocomplete="off" />
-      </div>
+  <main v-else id="main" class="screen trail-page">
+    <svg class="trail-bg" viewBox="0 0 1600 1000" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#EFEEE2" /><stop offset="1" stop-color="#DFE5D6" />
+        </linearGradient>
+        <linearGradient id="tmist" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity=".5" /><stop offset="1" stop-color="#FFFFFF" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <rect width="1600" height="1000" fill="url(#tsky)" />
+      <polygon points="0,1000 0,330 230,170 520,560 600,1000" fill="#BCC9B4" />
+      <polygon points="900,1000 1260,180 1600,520 1600,1000" fill="#C3CFBA" />
+      <polygon points="330,1000 1000,40 1460,1000" fill="#B9C8A4" />
+      <polygon points="330,1000 1000,40 930,300 1040,520 780,1000" fill="#8FA882" />
+      <polygon points="935,120 1000,40 1068,128 1030,118 1000,148 968,118" fill="#F2F1E3" />
+      <!-- 雲霧帶：第 5 層以上 -->
+      <rect x="0" y="0" width="1600" height="480" fill="url(#tmist)" />
+      <g fill="none" stroke="#2F4A36" stroke-opacity=".1">
+        <path d="M520,700 C760,660 1100,680 1300,720" /><path d="M640,520 C840,490 1080,500 1220,540" /><path d="M760,340 C900,320 1060,330 1150,350" />
+      </g>
+      <polygon points="0,1000 0,740 180,660 440,1000" fill="#7D9A70" />
+      <polygon points="1100,1000 1420,580 1600,660 1600,1000" fill="#7D9A70" />
+      <g fill="#5A7752"><path v-for="(d, i) in bgTrees" :key="i" :d="d" /></g>
+    </svg>
 
-      <div style="display: flex; flex-direction: column; gap: 2px" role="group" aria-labelledby="flt">
-        <div id="flt" class="field-label" style="margin-bottom: 4px">狀態篩選</div>
-        <button
-          v-for="f in filters" :key="f.key" type="button" class="fbtn" :class="{ on: filter === f.key }"
-          :aria-pressed="filter === f.key" @click="filter = f.key"
-        >
-          <span v-if="f.key !== 'all'" class="dot" :class="f.key" aria-hidden="true" />
-          <span>{{ f.label }}</span><span class="n">{{ f.count }}</span>
+    <div class="trail-head">
+      <div class="mono eyebrow">Trail map / {{ stages.length }} stages · one ascent</div>
+      <h1 class="trail-title">{{ entry?.title ?? mountain.title }}</h1>
+      <p class="trail-sub">{{ mountain.title }}・{{ nodes.length }} 個知識點</p>
+    </div>
+    <div class="trail-vert mono" aria-hidden="true">Foundation → Independent delivery</div>
+
+    <div class="trail-tools">
+      <label for="q" class="visually-hidden">找知識點</label>
+      <input id="q" v-model="q" type="search" class="search" placeholder="找知識點：交易、CORS" autocomplete="off" />
+      <button type="button" class="tool-btn" @click="openAll">全部知識點</button>
+    </div>
+
+    <div class="trail-area">
+    <svg class="trail-svg" viewBox="0 0 1600 1000" preserveAspectRatio="none" aria-hidden="true">
+      <path :d="trailPath" class="trail-line" />
+    </svg>
+    <ol class="stages" aria-label="由山腳到山頂的營地">
+      <li
+        v-for="s in stages" :key="s.n" class="stage"
+        :class="{ up: s.up, current: s.current, active: activeLayer === s.n, dim: term && !s.hits }"
+        :style="{ left: `${s.spot.x}%`, top: `${s.spot.y}%` }"
+      >
+        <button type="button" class="stage-card" @click="openLayer(s.n)">
+          <span class="stage-title"><span class="stage-no">{{ String(s.n).padStart(2, '0') }}</span>{{ s.name }}</span>
+          <span class="stage-kw">{{ s.keywords ?? s.alt }}</span>
+          <span v-if="s.current" class="stage-here"><span class="marker-dot light" aria-hidden="true" />{{ latest?.label }} · 目前位置</span>
+          <span v-if="term && s.hits" class="stage-badge" :aria-label="`${s.hits} 個符合`">{{ s.hits }}</span>
         </button>
-      </div>
-
-      <div class="note-box">
-        <div style="font-weight: 700; margin-bottom: 4px">怎麼讀這座山</div>
-        高度是學習順序，不是完成率。越下面越基礎，上層要靠下層才站得住。雲霧帶是 W3 之後的課程，多數只討論過、還沒實作。
-      </div>
-
-      <div style="font-size: 12px; color: var(--muted); line-height: 1.8">
-        <div class="mono eyebrow">Content baseline</div>
-        依 PROGRESS.md 證據 E01–{{ lastEvidence }}
-      </div>
-    </aside>
-
-    <main id="main" class="main">
-      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
-        <div>
-          <div class="mono eyebrow">The Builder / Knowledge Map</div>
-          <h1 class="page-title">{{ mountain.title }}</h1>
-          <p class="lead">
-            {{ nodes.length }} 個知識點、{{ mountain.layers.length }} 層。帶做 {{ count('guided') }}、討論 {{ count('discussed') }}、待探索 {{ count('unexplored') }}。
-            {{ view === 'map' ? '點任一個知識點看它的一句話結論與證據。' : '由第 1 層往上列出，點一列進入完整筆記。' }}
-          </p>
-        </div>
-        <div class="seg" role="group" aria-label="檢視方式">
-          <button type="button" :class="{ on: view === 'map' }" :aria-pressed="view === 'map'" @click="setQuery({ view: undefined })">地圖</button>
-          <button type="button" :class="{ on: view === 'list' }" :aria-pressed="view === 'list'" @click="setQuery({ view: 'list' })">清單</button>
-        </div>
-      </div>
-
-      <p class="visually-hidden" aria-live="polite">{{ nodes.filter(match).length }} 個知識點符合條件</p>
-
-      <!-- 地圖：每層一條帶，由下往上；不畫連線 -->
-      <section v-if="view === 'map'" class="map" aria-label="知識地圖，由上而下為山頂到山腳">
-        <svg viewBox="0 0 1000 900" preserveAspectRatio="none" aria-hidden="true">
-          <polygon points="0,900 0,520 150,380 300,540 420,300 520,60 640,320 760,220 1000,520 1000,900" fill="#D5DCC6" />
-          <polygon points="40,900 520,50 980,900" fill="#A9B999" />
-          <polygon points="520,50 980,900 640,900 560,420" fill="#BFCBAE" />
-          <polygon points="455,165 520,50 585,165 552,150 520,182 488,150" fill="#F4F2E6" />
-          <polygon points="0,900 0,820 1000,820 1000,900" fill="#8FA27F" />
-          <g fill="#5F7656">
-            <polygon points="40,860 56,826 72,860" /><polygon points="110,872 130,830 150,872" /><polygon points="210,866 226,834 242,866" />
-            <polygon points="760,868 778,830 796,868" /><polygon points="850,872 870,828 890,872" /><polygon points="930,862 946,830 962,862" />
-          </g>
-        </svg>
-        <div class="bands">
-          <div
-            v-for="l in layersTop" :key="l.n" class="band" :class="[`b${l.n}`, { mist: l.n >= mountain.mistFromLayer }]"
-            role="group" :aria-label="`第 ${l.n} 層 ${l.alt}・${l.name}`"
-          >
-            <div class="lbl"><b>{{ l.alt }}・{{ l.name }}</b><span>{{ l.weeks }}</span></div>
-            <div class="chips">
-              <button
-                v-for="n in nodesIn(l.n)" :key="n.id" type="button" class="chip"
-                :class="[n.status, { 'is-sel': n.id === selId, 'is-dim': !match(n) }]"
-                :aria-pressed="n.id === selId" @click="pick(n.id)"
-              >
-                <span class="dot" :class="n.status" aria-hidden="true" />{{ n.title }}
-                <span class="visually-hidden">，{{ STATUS_LABEL[n.status] }}</span>
-              </button>
+        <!-- hover／鍵盤聚焦時滑開該層的所有知識點 -->
+        <div class="stage-pop">
+          <div class="pop-inner">
+            <div class="pop-head">
+              <span>{{ s.alt }}・{{ s.weeks }}</span>
+              <span class="pop-counts" :aria-label="`帶做 ${s.counts.guided}、討論 ${s.counts.discussed}、待探索 ${s.counts.unexplored}`">
+                <span><span class="dot guided" aria-hidden="true" />{{ s.counts.guided }}</span>
+                <span><span class="dot discussed" aria-hidden="true" />{{ s.counts.discussed }}</span>
+                <span><span class="dot unexplored" aria-hidden="true" />{{ s.counts.unexplored }}</span>
+              </span>
             </div>
+            <ul class="pop-chips">
+              <li v-for="n in s.list" :key="n.id">
+                <button type="button" class="chip" :class="[n.status, { 'is-dim': !hit(n) }]" @click="openKnowledge(n.id)">
+                  <span class="dot" :class="n.status" aria-hidden="true" />{{ n.title }}
+                  <span class="visually-hidden">，{{ STATUS_LABEL[n.status] }}</span>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
-      </section>
+      </li>
+    </ol>
+    </div>
 
-      <!-- 清單：主要入口，由第 1 層往上 -->
-      <section v-else class="list" aria-label="知識清單，由基礎往上">
-        <template v-if="anyMatch">
-          <template v-for="l in layersBottom" :key="l.n">
-            <template v-if="matchedIn(l.n).length">
-              <h2 class="list-head" style="margin: 0">第 {{ l.n }} 層｜{{ l.alt }}・{{ l.name }}<span class="mono">{{ l.weeks }}</span></h2>
-              <RouterLink v-for="n in matchedIn(l.n)" :key="n.id" :to="`/k/${n.id}`" class="row">
-                <b>{{ n.title }}</b>
-                <span class="st"><span class="dot" :class="n.status" aria-hidden="true" />{{ STATUS_LABEL[n.status] }}</span>
-                <span class="sum">{{ n.summary }}</span>
-                <span class="ev">{{ evidenceShort(n) }}</span>
-              </RouterLink>
-            </template>
-          </template>
-        </template>
-        <p v-else class="empty">沒有符合的知識點，換個關鍵字或狀態試試。</p>
-      </section>
+    <div class="trail-legend">
+      <span><span class="legend-cur" aria-hidden="true" />目前位置</span>
+      <span><span class="legend-card" aria-hidden="true" />已有課程安排</span>
+      <span class="legend-hint hint-hover">滑過營地看知識點，點擊開啟</span>
+      <span class="legend-hint hint-tap">點營地看知識點</span>
+      <span class="legend-note">位置代表依賴順序，不代表完成率</span>
+    </div>
 
-      <section v-if="view === 'map'" ref="detailEl" class="card detail" aria-label="選取的知識點" aria-live="polite">
-        <div class="detail-main">
-          <div class="meta-row">
-            <span class="pill" :class="sel.status"><span class="dot" :class="sel.status" aria-hidden="true" />{{ STATUS_LABEL[sel.status] }}</span>
-            <span>第 {{ sel.layer }} 層・{{ selLayer?.alt }}・{{ selLayer?.name }}</span>
-            <span class="mono" style="font-size: 11px">{{ sel.id }}</span>
-          </div>
-          <h2>{{ sel.title }}</h2>
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <p class="summary" v-html="tip(sel.summary, `sel-${sel.id}`)" />
-          <RouterLink :to="`/k/${sel.id}`" class="btn-link">閱讀完整筆記 →</RouterLink>
-        </div>
-        <dl class="kv">
-          <dt>證據</dt><dd>{{ evidenceText(sel) }}</dd>
-          <dt>週次</dt><dd>{{ sel.weeks.join('、') || '—' }}</dd>
-          <dt>相關</dt>
-          <dd>
-            <span class="inline-links">
-              <RouterLink v-for="r in sel.related" :key="r" :to="{ query: { ...route.query, sel: r } }">{{ knowledgeMap.get(r)?.title }}</RouterLink>
-            </span>
-          </dd>
-        </dl>
-      </section>
-
-      <p class="foot">位置代表知識的依賴順序，不代表完成率。狀態對應 PROGRESS.md：帶做＝L2、討論＝L1、待探索＝L0。</p>
-    </main>
-  </div>
+    <SidePanel
+      :mountain="mountain" :nodes="nodes" :q="q"
+      @close="closePanel" @open-knowledge="openKnowledge" @open-layer="openLayer"
+    />
+  </main>
 </template>

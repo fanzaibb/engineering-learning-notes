@@ -5,8 +5,12 @@ export type Status = 'guided' | 'discussed' | 'unexplored';
 export type SourceKind = 'official' | 'engineering' | 'course';
 
 export interface Source { title: string; url?: string; kind: SourceKind }
-export interface Layer { n: number; alt: string; name: string; weeks: string }
-export interface Mountain { id: string; title: string; subtitle: string; layers: Layer[]; mistFromLayer: number }
+export interface Layer { n: number; alt: string; name: string; weeks: string; keywords?: string }
+export interface Mountain { id: string; title: string; subtitle: string; layers: Layer[]; mistFromLayer: number; currentLayer?: number }
+export interface RangeEntry {
+  id: string; no: string; role: string; roleZh: string; title: string; tagline: string;
+  status: 'active' | 'partial' | 'planned'; statusText: string;
+}
 export interface GlossaryItem { abbr: string; full: string; zh: string }
 export interface Evidence { id: string; source: string; note: string }
 
@@ -46,6 +50,9 @@ const mountainRaw = import.meta.glob('../../../knowledge/*/_mountain.yml', {
 const glossaryRaw = import.meta.glob('../../../knowledge/glossary.yml', {
   query: '?raw', import: 'default', eager: true,
 }) as Record<string, string>;
+const rangeRaw = import.meta.glob('../../../knowledge/range.yml', {
+  query: '?raw', import: 'default', eager: true,
+}) as Record<string, string>;
 const notesRaw = import.meta.glob('../../../notes/*.md', {
   query: '?raw', import: 'default', eager: true,
 }) as Record<string, string>;
@@ -66,6 +73,7 @@ export const glossaryMap = new Map(glossary.map((g) => [g.abbr, g]));
 
 export const mountains: Mountain[] = Object.values(mountainRaw).map((t) => YAML.parse(t) as Mountain);
 export const mountainMap = new Map(mountains.map((m) => [m.id, m]));
+export const range: RangeEntry[] = Object.values(rangeRaw).flatMap((t) => (YAML.parse(t) ?? []) as RangeEntry[]);
 
 export const knowledge: Knowledge[] = Object.entries(knowledgeRaw)
   .map(([path, text]) => {

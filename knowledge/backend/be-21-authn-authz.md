@@ -17,10 +17,6 @@ sources:
 updated: 2026-11-11
 ---
 
-## 用前端經驗來想
-
-TODO：待使用者補上自己的前端類比。
-
 ## 說明
 
 Day 01 在 Azure 討論過 RBAC：角色指派由 Principal（誰）、Role（能做什麼）、Scope（涵蓋範圍）組成，上層指派向下繼承。

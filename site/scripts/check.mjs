@@ -24,7 +24,7 @@ function splitFrontmatter(text) {
 
 const REQUIRED = ['id', 'title', 'mountain', 'layer', 'status', 'summary', 'updated'];
 const STATUSES = ['guided', 'discussed', 'unexplored'];
-const SECTION_ORDER = ['用前端經驗來想', '說明', '易混淆點', '我做過什麼', '還沒做的'];
+const SECTION_ORDER = ['說明', '易混淆點', '我做過什麼', '還沒做的'];
 
 // 證據索引：PROGRESS.md 中以「| E<數字> |」開頭的列
 const evidenceIds = new Set();
@@ -82,6 +82,7 @@ for (const dir of readdirSync(KNOWLEDGE)) {
   if (!existsSync(mf)) { err(p, '缺少 _mountain.yml'); continue; }
   const m = YAML.parse(readFileSync(mf, 'utf8'));
   mountains[m.id] = { ...m, dir: p, layerSet: new Set((m.layers ?? []).map((l) => l.n)) };
+  if (m.currentLayer !== undefined && !mountains[m.id].layerSet.has(m.currentLayer)) err(mf, `currentLayer ${m.currentLayer} 不在 layers 中`);
 }
 
 // 知識點

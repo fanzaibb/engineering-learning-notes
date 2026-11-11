@@ -17,11 +17,9 @@ sources:
 updated: 2026-11-11
 ---
 
-## 用前端經驗來想
+## 說明
 
 前端依 `error.code` 處理行為，文案可以集中管理（Day 04）。
-
-## 說明
 
 server.ts 以 `sendError` 統一 `error.code`、`message` 與選填 `field`；金額、分類、JSON、內容大小、內容型別與 404 都有可辨識的代碼（Day 04）。
 
