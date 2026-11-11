@@ -1,0 +1,13 @@
+id: backend
+title: 後端開發山
+subtitle: 請求、資料與服務的內在邏輯
+layers:                      # 由下往上，n 越小越基礎
+  - { n: 1, alt: 山腳, name: 網路地基, weeks: W1 }
+  - { n: 2, alt: 林道, name: 執行環境與 HTTP, weeks: W1–W2 }
+  - { n: 3, alt: 溪谷, name: 資料層, weeks: W1–W2 }
+  - { n: 4, alt: 稜線, name: API 契約與測試, weeks: W1–W2 }
+  - { n: 5, alt: 雲霧帶, name: 身分與資料權限, weeks: W3 }
+  - { n: 6, alt: 雲霧帶, name: 一致性與併發, weeks: W4 }
+  - { n: 7, alt: 高原, name: 交付與維運, weeks: W4–W6 }
+  - { n: 8, alt: 山頂, name: 獨立交付, weeks: W7–W8 }
+mistFromLayer: 5             # 從第 5 層起以雲霧樣式呈現

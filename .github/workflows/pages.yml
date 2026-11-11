@@ -1,0 +1,57 @@
+# 推送到 main 且內容或網站有變動時，檢查內容、建置並部署到 GitHub Pages。
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'knowledge/**'
+      - 'notes/**'
+      - 'curriculum/PROGRESS.md'
+      - 'site/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      # 建置前檢查：錯誤中止；敏感資訊有警告也中止部署
+      - name: Content check
+        run: |
+          npm run check | tee check.log
+          if grep -q '可能含敏感資訊' check.log; then echo '敏感資訊掃描有警告，停止部署'; exit 1; fi
+      - run: npx vue-tsc --noEmit
+      - run: npx vite build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
