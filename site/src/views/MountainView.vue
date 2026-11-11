@@ -19,10 +19,15 @@ watchEffect(() => {
   document.title = `${entry.value?.title ?? mountain.value?.title ?? '找不到頁面'}｜山行・知識山域`;
 });
 
-// 營地位置（百分比，卡片中心），由山腳往山頂之字形
+// 山與路徑共用同一個座標（viewBox 200×100，對應營地區塊），縮放時不會錯位。
+// 山頂 (100,-6)，山腳 (-16,108)～(216,108)；營地點都落在山的輪廓內。
+const PEAK = { x: 100, y: -6 };
+const BASE_Y = 108;
+const HALF_BASE = 116;
+// 營地位置（百分比，卡片中心），由山腳往山頂之字形，越高越靠近中線
 const SPOTS = [
-  { x: 22, y: 86 }, { x: 50, y: 75 }, { x: 29, y: 64 }, { x: 63, y: 54 },
-  { x: 37, y: 43 }, { x: 68, y: 32 }, { x: 43, y: 21 }, { x: 62, y: 10 },
+  { x: 31, y: 88 }, { x: 65, y: 77 }, { x: 36, y: 66 }, { x: 63, y: 55 },
+  { x: 39, y: 44 }, { x: 60, y: 33 }, { x: 44, y: 22 }, { x: 53, y: 10 },
 ];
 
 const q = ref('');
@@ -49,11 +54,11 @@ const stages = computed(() => {
   });
 });
 
-// 路徑：依序通過各營地的平滑曲線（viewBox 1600×1000）
+// 路徑：從山腳出發，依序通過各營地的平滑曲線
 const trailPath = computed(() => {
-  const pts = stages.value.map((s) => [s.spot.x * 16, s.spot.y * 10]);
+  const pts = stages.value.map((s) => [s.spot.x * 2, s.spot.y]);
   if (!pts.length) return '';
-  let d = `M${pts[0][0] - 120},${pts[0][1] + 140} Q${pts[0][0] - 40},${pts[0][1] + 40} ${pts[0][0]},${pts[0][1]}`;
+  let d = `M${pts[0][0] - 10},${BASE_Y} C${pts[0][0] - 10},${pts[0][1] + 8} ${pts[0][0]},${pts[0][1] + 8} ${pts[0][0]},${pts[0][1]}`;
   for (let i = 1; i < pts.length; i++) {
     const [x0, y0] = pts[i - 1];
     const [x1, y1] = pts[i];
@@ -79,10 +84,16 @@ const activeLayer = computed(() => {
   return k?.layer ?? (route.query.layer ? Number(route.query.layer) : null);
 });
 
-const bgTrees = [
-  ...makeTrees(18, 5, { x0: 0, x1: 380, y0: 720, y1: 1010 }, [40, 80]),
-  ...makeTrees(16, 9, { x0: 1180, x1: 1600, y0: 660, y1: 1010 }, [40, 80]),
-  ...makeTrees(14, 17, { x0: 420, x1: 1180, y0: 930, y1: 1015 }, [30, 60]),
+// 山的兩面（同首頁畫法）：亮面整座、暗面在左側
+const mtn = {
+  body: `${PEAK.x},${PEAK.y} ${PEAK.x - HALF_BASE},${BASE_Y} ${PEAK.x + HALF_BASE},${BASE_Y}`,
+  shade: `${PEAK.x},${PEAK.y} ${PEAK.x - HALF_BASE},${BASE_Y} ${PEAK.x - 38},${BASE_Y} ${PEAK.x - 6},${62} ${PEAK.x - 14},${30}`,
+  snow: `${PEAK.x - 13},${PEAK.y + 15} ${PEAK.x},${PEAK.y} ${PEAK.x + 14},${PEAK.y + 16} ${PEAK.x + 7},${PEAK.y + 13} ${PEAK.x},${PEAK.y + 19} ${PEAK.x - 6},${PEAK.y + 13}`,
+};
+const trees = [
+  ...makeTrees(22, 5, { x0: -10, x1: 70, y0: 96, y1: 110 }, [5, 9]),
+  ...makeTrees(18, 9, { x0: 130, x1: 210, y0: 96, y1: 110 }, [5, 9]),
+  ...makeTrees(16, 17, { x0: 60, x1: 140, y0: 101, y1: 111 }, [4, 7]),
 ].map(pine);
 </script>
 
@@ -102,26 +113,11 @@ const bgTrees = [
     <svg class="trail-bg" viewBox="0 0 1600 1000" preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#EFEEE2" /><stop offset="1" stop-color="#DFE5D6" />
-        </linearGradient>
-        <linearGradient id="tmist" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#FFFFFF" stop-opacity=".5" /><stop offset="1" stop-color="#FFFFFF" stop-opacity="0" />
+          <stop offset="0" stop-color="#F7F4EA" /><stop offset="1" stop-color="#E9ECDF" />
         </linearGradient>
       </defs>
       <rect width="1600" height="1000" fill="url(#tsky)" />
-      <polygon points="0,1000 0,330 230,170 520,560 600,1000" fill="#BCC9B4" />
-      <polygon points="900,1000 1260,180 1600,520 1600,1000" fill="#C3CFBA" />
-      <polygon points="330,1000 1000,40 1460,1000" fill="#B9C8A4" />
-      <polygon points="330,1000 1000,40 930,300 1040,520 780,1000" fill="#8FA882" />
-      <polygon points="935,120 1000,40 1068,128 1030,118 1000,148 968,118" fill="#F2F1E3" />
-      <!-- 雲霧帶：第 5 層以上 -->
-      <rect x="0" y="0" width="1600" height="480" fill="url(#tmist)" />
-      <g fill="none" stroke="#2F4A36" stroke-opacity=".1">
-        <path d="M520,700 C760,660 1100,680 1300,720" /><path d="M640,520 C840,490 1080,500 1220,540" /><path d="M760,340 C900,320 1060,330 1150,350" />
-      </g>
-      <polygon points="0,1000 0,740 180,660 440,1000" fill="#7D9A70" />
-      <polygon points="1100,1000 1420,580 1600,660 1600,1000" fill="#7D9A70" />
-      <g fill="#5A7752"><path v-for="(d, i) in bgTrees" :key="i" :d="d" /></g>
+      <rect y="930" width="1600" height="70" fill="#C9D3BE" />
     </svg>
 
     <div class="trail-head">
@@ -138,8 +134,28 @@ const bgTrees = [
     </div>
 
     <div class="trail-area">
-    <svg class="trail-svg" viewBox="0 0 1600 1000" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="trail-svg" viewBox="0 0 200 100" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <clipPath id="mclip"><polygon :points="mtn.body" /></clipPath>
+        <linearGradient id="tmist" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity=".45" /><stop offset="1" stop-color="#FFFFFF" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <polygon :points="mtn.body" fill="#A3B994" />
+      <polygon :points="mtn.shade" fill="#7E9B70" />
+      <g clip-path="url(#mclip)">
+        <!-- 等高線 -->
+        <g fill="none" stroke="#2F4A36" stroke-opacity=".12" stroke-width="1" vector-effect="non-scaling-stroke">
+          <path d="M20,84 C60,78 120,80 180,86" vector-effect="non-scaling-stroke" />
+          <path d="M44,60 C80,55 120,57 156,62" vector-effect="non-scaling-stroke" />
+          <path d="M66,36 C90,33 112,34 134,38" vector-effect="non-scaling-stroke" />
+        </g>
+        <!-- 雲霧帶：第 5 層以上 -->
+        <rect x="0" y="-10" width="200" height="60" fill="url(#tmist)" />
+      </g>
+      <polygon :points="mtn.snow" fill="#F3F1E4" />
       <path :d="trailPath" class="trail-line" />
+      <g fill="#5E7A58"><path v-for="(d, i) in trees" :key="i" :d="d" /></g>
     </svg>
     <ol class="stages" aria-label="由山腳到山頂的營地">
       <li
