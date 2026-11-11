@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, RouterLink } from 'vue-router';
 import {
-  knowledgeMap, evidenceMap, glossaryMap, daysForKnowledge,
+  knowledgeMap, evidenceMap, glossaryMap, daysForKnowledge, weekOf,
   STATUS_LABEL, STATUS_LEVEL, KIND_LABEL,
   type Knowledge, type Mountain, type Status, type SourceKind,
 } from '../lib/content';
@@ -50,6 +50,16 @@ const rendered = computed(() => {
   };
 });
 const appearsIn = computed(() => (k.value ? daysForKnowledge(k.value.id) : []));
+// 依每日筆記日期算出這個知識點在第幾週出現過
+const weeksSeen = computed(() => {
+  const map = new Map<number, typeof appearsIn.value>();
+  for (const d of appearsIn.value) {
+    const w = weekOf(d.date, props.mountain.courseStart);
+    if (!w) continue;
+    map.set(w, [...(map.get(w) ?? []), d]);
+  }
+  return [...map.entries()].sort((a, b) => a[0] - b[0]).map(([week, days]) => ({ week, days }));
+});
 const KIND_ORDER: SourceKind[] = ['official', 'engineering', 'course'];
 const sourceGroups = computed(() => KIND_ORDER
   .map((kind) => ({ kind, items: (k.value?.sources ?? []).filter((s) => s.kind === kind) }))
@@ -83,7 +93,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey));
     <div ref="scroller" class="panel-body">
       <!-- 一層 -->
       <template v-if="mode === 'layer' && layer">
-        <div class="meta-row"><span class="mono" style="font-size: 11px">Stage {{ String(layer.n).padStart(2, '0') }}</span><span>{{ layer.alt }}・{{ layer.weeks }}</span></div>
+        <div class="meta-row"><span class="mono" style="font-size: 11px">Stage {{ String(layer.n).padStart(2, '0') }}</span><span>{{ layer.alt }}</span></div>
         <h2 id="panel-h" ref="heading" tabindex="-1" class="panel-title">{{ layer.name }}</h2>
         <p class="panel-sub">{{ layer.keywords }}</p>
         <ul class="plist">
@@ -141,7 +151,6 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey));
             <span v-else>尚無證據編號</span>
             <span v-if="k.evidenceNote" class="sub">{{ k.evidenceNote }}</span>
           </dd>
-          <dt>週次</dt><dd>{{ k.weeks.join('、') || '尚未排定' }}</dd>
           <template v-if="k.related.length">
             <dt>相關</dt>
             <dd class="inline-links">
@@ -149,9 +158,12 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey));
             </dd>
           </template>
           <dt>出現在</dt>
-          <dd class="inline-links">
-            <RouterLink v-for="d in appearsIn" :key="d.date" :to="`/day/${d.date}`">{{ d.label }}</RouterLink>
-            <span v-if="!appearsIn.length">還沒有每日筆記連到這裡</span>
+          <dd>
+            <span v-for="w in weeksSeen" :key="w.week" class="week-line">
+              <b class="week-tag">W{{ w.week }}</b>
+              <span class="inline-links"><RouterLink v-for="d in w.days" :key="d.date" :to="`/day/${d.date}`">{{ d.label }}</RouterLink></span>
+            </span>
+            <span v-if="!weeksSeen.length">還沒出現在每日筆記</span>
           </dd>
         </dl>
 

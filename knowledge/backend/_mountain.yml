@@ -11,4 +11,5 @@ layers:                      # 由下往上，n 越小越基礎；keywords 顯�
   - { n: 7, alt: 高原, name: 交付與維運, weeks: W4–W6, keywords: 容器・CI・日誌・備份 }
   - { n: 8, alt: 山頂, name: 獨立交付, weeks: W7–W8, keywords: 獨立變更・重建・複驗 }
 mistFromLayer: 5             # 從第 5 層起以雲霧樣式呈現
+courseStart: 2026-11-05     # W1 第一天（PROGRESS.md：W1 為 11/05～11/11），用來算筆記屬第幾週
 currentLayer: 4              # 目前位置（人工設定）：Day 05 的整合測試屬第 4 層

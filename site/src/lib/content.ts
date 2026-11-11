@@ -6,7 +6,7 @@ export type SourceKind = 'official' | 'engineering' | 'course';
 
 export interface Source { title: string; url?: string; kind: SourceKind }
 export interface Layer { n: number; alt: string; name: string; weeks: string; keywords?: string }
-export interface Mountain { id: string; title: string; subtitle: string; layers: Layer[]; mistFromLayer: number; currentLayer?: number }
+export interface Mountain { id: string; title: string; subtitle: string; layers: Layer[]; mistFromLayer: number; currentLayer?: number; courseStart?: string }
 export interface RangeEntry {
   id: string; no: string; role: string; roleZh: string; title: string; tagline: string;
   status: 'active' | 'partial' | 'planned'; statusText: string;
@@ -117,6 +117,13 @@ export const days: DayNote[] = Object.entries(notesRaw)
   .filter((d) => d.date)
   .sort((a, b) => a.date.localeCompare(b.date));
 export const dayByDate = new Map(days.map((d) => [d.date, d]));
+
+/** 日期是課程第幾週（courseStart 當天起算，每 7 天一週） */
+export function weekOf(date: string, courseStart?: string): number | null {
+  if (!courseStart) return null;
+  const diff = Math.floor((Date.parse(date) - Date.parse(courseStart)) / 86400000);
+  return diff >= 0 ? Math.floor(diff / 7) + 1 : null;
+}
 
 export function daysForKnowledge(id: string): DayNote[] {
   return days.filter((d) => d.topics.includes(id));

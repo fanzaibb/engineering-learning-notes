@@ -207,6 +207,8 @@ a:hover { color: var(--forest-dark); }
 .kv dt { color: var(--muted); }
 .kv dd { margin: 0; }
 .ev-line { display: block; }
+.week-line { display: flex; align-items: center; gap: 10px; }
+.week-tag { font-family: var(--mono); font-weight: 500; min-width: 26px; }
 .mono-id { font-family: var(--mono); font-weight: 500; }
 .psection { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; }
 .psection h3 { margin: 0 0 8px; font-size: 13px; color: var(--ink-3); }

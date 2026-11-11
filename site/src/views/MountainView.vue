@@ -157,7 +157,7 @@ const bgTrees = [
         <div class="stage-pop">
           <div class="pop-inner">
             <div class="pop-head">
-              <span>{{ s.alt }}・{{ s.weeks }}</span>
+              <span>{{ s.alt }}</span>
               <span class="pop-counts" :aria-label="`帶做 ${s.counts.guided}、討論 ${s.counts.discussed}、待探索 ${s.counts.unexplored}`">
                 <span><span class="dot guided" aria-hidden="true" />{{ s.counts.guided }}</span>
                 <span><span class="dot discussed" aria-hidden="true" />{{ s.counts.discussed }}</span>
