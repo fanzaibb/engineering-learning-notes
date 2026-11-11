@@ -1,3 +1,8 @@
+---
+date: 2026-11-05
+topics: [be-01, be-02, be-04, be-05, be-06, be-07, be-08, be-10, be-21]
+---
+
 # Day 01｜Node.js、TCP/IP、Azure 與 Expense API
 
 **日期** 2026-11-05

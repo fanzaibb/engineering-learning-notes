@@ -1,0 +1,25 @@
+# 首頁三座山。mountain 對應 knowledge/<id>/_mountain.yml；沒有對應資料夾的山顯示為規劃中。
+- id: backend
+  no: "01"
+  role: THE BUILDER
+  roleZh: 獨立交付一個服務
+  title: 後端與軟體工程
+  tagline: 從 HTTP 到獨立部署
+  status: active            # active 進行中 | partial 有局部證據 | planned 待設定
+  statusText: ""            # 空白時自動顯示「<最新每日筆記> · 進行中」
+- id: azure
+  no: "02"
+  role: THE ADMINISTRATOR
+  roleZh: Azure 管理與實驗
+  title: AZ-104
+  tagline: 考綱 × 管理 × 上機實驗
+  status: partial
+  statusText: 身分／網路已有局部證據
+- id: toeic
+  no: "03"
+  role: THE COMMUNICATOR
+  roleZh: 聽得懂，也讀得準
+  title: 多益準備
+  tagline: 聽力 × 閱讀 × 錯題回訪
+  status: planned
+  statusText: 目標／起點待設定

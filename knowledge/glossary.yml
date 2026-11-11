@@ -1,0 +1,55 @@
+# 縮寫對照表：abbr 區分大小寫、整詞比對
+- { abbr: API, full: Application Programming Interface, zh: 應用程式介面 }
+- { abbr: ARM, full: Azure Resource Manager, zh: Azure 資源管理員 }
+- { abbr: ARP, full: Address Resolution Protocol, zh: 位址解析協定 }
+- { abbr: ASIC, full: Application-Specific Integrated Circuit, zh: 特定應用積體電路 }
+- { abbr: BGP, full: Border Gateway Protocol, zh: 邊界閘道協定 }
+- { abbr: CI, full: Continuous Integration, zh: 持續整合 }
+- { abbr: CIDR, full: Classless Inter-Domain Routing, zh: 無類別域間路由 }
+- { abbr: CLI, full: Command-Line Interface, zh: 命令列介面 }
+- { abbr: CORS, full: Cross-Origin Resource Sharing, zh: 跨來源資源共享 }
+- { abbr: CPU, full: Central Processing Unit, zh: 中央處理器 }
+- { abbr: CRUD, full: "Create, Read, Update, Delete", zh: 新增、讀取、更新、刪除 }
+- { abbr: CSRF, full: Cross-Site Request Forgery, zh: 跨站請求偽造 }
+- { abbr: DNS, full: Domain Name System, zh: 網域名稱系統 }
+- { abbr: FK, full: Foreign Key, zh: 外鍵 }
+- { abbr: HTTP, full: HyperText Transfer Protocol, zh: 超文字傳輸協定 }
+- { abbr: ID, full: Identifier, zh: 識別碼 }
+- { abbr: IP, full: Internet Protocol, zh: 網際網路協定 }
+- { abbr: IPv4, full: Internet Protocol version 4, zh: 網際網路協定第 4 版 }
+- { abbr: IPv6, full: Internet Protocol version 6, zh: 網際網路協定第 6 版 }
+- { abbr: JSON, full: JavaScript Object Notation, zh: JavaScript 物件表示法 }
+- { abbr: MAC, full: Media Access Control, zh: 媒體存取控制 }
+- { abbr: NAT, full: Network Address Translation, zh: 網路位址轉換 }
+- { abbr: NSG, full: Network Security Group, zh: 網路安全性群組 }
+- { abbr: OSI, full: Open Systems Interconnection, zh: 開放式系統互連 }
+- { abbr: PK, full: Primary Key, zh: 主鍵 }
+- { abbr: RBAC, full: Role-Based Access Control, zh: 角色型存取控制 }
+- { abbr: RTT, full: Round-Trip Time, zh: 往返時間 }
+- { abbr: SQL, full: Structured Query Language, zh: 結構化查詢語言 }
+- { abbr: TCP, full: Transmission Control Protocol, zh: 傳輸控制協定 }
+- { abbr: TLS, full: Transport Layer Security, zh: 傳輸層安全性 }
+- { abbr: TTL, full: Time to Live, zh: 存活時間 }
+- { abbr: UDP, full: User Datagram Protocol, zh: 使用者資料報協定 }
+- { abbr: URL, full: Uniform Resource Locator, zh: 統一資源定位器 }
+- { abbr: VM, full: Virtual Machine, zh: 虛擬機器 }
+- { abbr: VNet, full: Virtual Network, zh: 虛擬網路 }
+- { abbr: VPN, full: Virtual Private Network, zh: 虛擬私人網路 }
+- { abbr: XSS, full: Cross-Site Scripting, zh: 跨站指令碼攻擊 }
+- { abbr: AI, full: Artificial Intelligence, zh: 人工智慧 }
+- { abbr: IPC, full: Inter-Process Communication, zh: 行程間通訊 }
+- { abbr: ISP, full: Internet Service Provider, zh: 網際網路服務供應商 }
+- { abbr: IT, full: Information Technology, zh: 資訊科技 }
+- { abbr: MIS, full: Management Information System, zh: 管理資訊系統 }
+- { abbr: CDN, full: Content Delivery Network, zh: 內容傳遞網路 }
+- { abbr: GUI, full: Graphical User Interface, zh: 圖形使用者介面 }
+- { abbr: NDP, full: Neighbor Discovery Protocol, zh: 鄰居探索協定 }
+- { abbr: PR, full: Pull Request, zh: 合併請求 }
+- { abbr: vCPU, full: virtual CPU, zh: 虛擬 CPU }
+- { abbr: SSD, full: Solid State Drive, zh: 固態硬碟 }
+- { abbr: HDD, full: Hard Disk Drive, zh: 硬碟 }
+- { abbr: UTC, full: Coordinated Universal Time, zh: 世界協調時間 }
+- { abbr: GMT, full: Greenwich Mean Time, zh: 格林威治時間 }
+- { abbr: GPU, full: Graphics Processing Unit, zh: 圖形處理器 }
+- { abbr: ARM64, full: 64-bit Arm architecture, zh: 64 位元 Arm 處理器架構 }
+- { abbr: OID, full: Object Identifier, zh: 物件識別碼 }

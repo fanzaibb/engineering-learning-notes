@@ -1,0 +1,15 @@
+id: backend
+title: 後端開發山
+subtitle: 請求、資料與服務的內在邏輯
+layers:                      # 由下往上，n 越小越基礎；keywords 顯示在路徑地圖的營地卡片
+  - { n: 1, alt: 山腳, name: 網路地基, weeks: W1, keywords: IP・路由・TCP・DNS }
+  - { n: 2, alt: 林道, name: 執行環境與 HTTP, weeks: W1–W2, keywords: Event Loop・HTTP・CORS }
+  - { n: 3, alt: 溪谷, name: 資料層, weeks: W1–W2, keywords: SQL・連線池・Migration }
+  - { n: 4, alt: 稜線, name: API 契約與測試, weeks: W1–W2, keywords: 驗證・CRUD・整合測試 }
+  - { n: 5, alt: 雲霧帶, name: 身分與資料權限, weeks: W3, keywords: 登入・授權・Cookie }
+  - { n: 6, alt: 雲霧帶, name: 一致性與併發, weeks: W4, keywords: 交易・版本・冪等 }
+  - { n: 7, alt: 高原, name: 交付與維運, weeks: W4–W6, keywords: 容器・CI・日誌・備份 }
+  - { n: 8, alt: 山頂, name: 獨立交付, weeks: W7–W8, keywords: 獨立變更・重建・複驗 }
+mistFromLayer: 5             # 從第 5 層起以雲霧樣式呈現
+courseStart: 2026-11-05     # W1 第一天（PROGRESS.md：W1 為 11/05～11/11），用來算筆記屬第幾週
+currentLayer: 4              # 目前位置（人工設定）：Day 05 的整合測試屬第 4 層
