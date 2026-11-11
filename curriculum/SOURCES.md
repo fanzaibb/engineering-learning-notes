@@ -37,6 +37,7 @@
 | [node-postgres 查詢](https://node-postgres.com/features/queries) | 參數化查詢與輸入邊界 |
 | [node-postgres 交易](https://node-postgres.com/features/transactions) | 同一條連線的交易、回滾與歸還 |
 | [node-postgres 連線池](https://node-postgres.com/features/pooling) | 借還生命週期與連線洩漏 |
+| [node-pg-migrate CLI](https://salsita.github.io/node-pg-migrate/cli) | 結構遷移工具；`DATABASE_URL` 或 PG 環境變數連線、預設追蹤表 `pgmigrations`、`--fake`、`--dry-run`、諮詢鎖。2026-11-11 查閱；網頁說明含 `status` 指令，但專案安裝的 9.x 只支援 up／down／create／redo，以實際 `--help` 為準 |
 | [PostgreSQL 官方教學](https://www.postgresql.org/docs/current/tutorial.html) | 關聯模型、SQL與交易的概念順序 |
 | [OWASP 授權指南](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html) | 逐請求資料授權與拒絕測試 |
 | [Node.js 測試執行器](https://nodejs.org/api/test.html) | 自動驗證的能力基準，具體工具可沿用熟悉工具 |

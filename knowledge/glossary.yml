@@ -45,3 +45,11 @@
 - { abbr: GUI, full: Graphical User Interface, zh: 圖形使用者介面 }
 - { abbr: NDP, full: Neighbor Discovery Protocol, zh: 鄰居探索協定 }
 - { abbr: PR, full: Pull Request, zh: 合併請求 }
+- { abbr: vCPU, full: virtual CPU, zh: 虛擬 CPU }
+- { abbr: SSD, full: Solid State Drive, zh: 固態硬碟 }
+- { abbr: HDD, full: Hard Disk Drive, zh: 硬碟 }
+- { abbr: UTC, full: Coordinated Universal Time, zh: 世界協調時間 }
+- { abbr: GMT, full: Greenwich Mean Time, zh: 格林威治時間 }
+- { abbr: GPU, full: Graphics Processing Unit, zh: 圖形處理器 }
+- { abbr: ARM64, full: 64-bit Arm architecture, zh: 64 位元 Arm 處理器架構 }
+- { abbr: OID, full: Object Identifier, zh: 物件識別碼 }
